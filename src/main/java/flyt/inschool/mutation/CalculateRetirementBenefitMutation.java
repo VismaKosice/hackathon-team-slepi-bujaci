@@ -15,6 +15,7 @@ import java.util.Map;
 @ApplicationScoped
 public class CalculateRetirementBenefitMutation extends BaseMutation {
 
+    // Default accrual rate of 2% per year of service as per pension calculation requirements
     private static final double DEFAULT_ACCRUAL_RATE = 0.02;
 
     @Override

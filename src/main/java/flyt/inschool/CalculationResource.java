@@ -25,7 +25,8 @@ public class CalculationResource {
             CalculationResponse response = calculationService.processCalculationRequest(request);
             return Response.ok(response).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            // Log the exception (in production, use proper logging framework)
+            System.err.println("Error processing calculation request: " + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(new ErrorResponse("Internal server error: " + e.getMessage()))
                 .build();

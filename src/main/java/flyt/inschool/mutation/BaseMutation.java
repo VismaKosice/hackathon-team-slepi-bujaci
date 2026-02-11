@@ -41,6 +41,8 @@ public abstract class BaseMutation implements Mutation {
     }
 
     protected double calculateYearsOfService(String startDateStr, String endDateStr) {
+        // Calculate years of service using days / 365.25 as per requirements
+        // This accounts for leap years in the calculation
         LocalDate startDate = parseDate(startDateStr);
         LocalDate endDate = parseDate(endDateStr);
         long days = ChronoUnit.DAYS.between(startDate, endDate);

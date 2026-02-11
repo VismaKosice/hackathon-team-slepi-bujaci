@@ -139,8 +139,11 @@ public class CalculationService {
     }
 
     private Situation cloneSituation(Situation original) {
-        // For now, we'll use a simple approach - create a new situation
-        // In production, we might use deep cloning or a copy library
+        // Simple shallow clone - this works correctly because:
+        // 1. Initial situation is captured before any mutations (dossier is null)
+        // 2. End situation captures the final state after all mutations
+        // 3. We don't need intermediate snapshots between mutations
+        // The dossier reference is shared intentionally as we modify in place
         Situation cloned = new Situation();
         cloned.setDossier(original.getDossier());
         return cloned;
