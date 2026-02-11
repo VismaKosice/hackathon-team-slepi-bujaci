@@ -133,7 +133,7 @@ function createSimpleRequestPayload() {
   };
 }
 
-// Create a complex request payload (10+ mutations)
+// Create a complex request payload (20+ mutations)
 function createComplexRequestPayload() {
   const dossierId = generateUUID();
   const personId = generateUUID();
@@ -154,8 +154,8 @@ function createComplexRequestPayload() {
     },
   });
 
-  // Add 7 policies
-  for (let i = 0; i < 7; i++) {
+  // Add 15 policies (increased from 7 to create more complex scenario)
+  for (let i = 0; i < 15; i++) {
     mutations.push({
       mutation_id: generateUUID(),
       mutation_definition_name: 'add_policy',
@@ -163,15 +163,16 @@ function createComplexRequestPayload() {
       actual_at: timestamp,
       dossier_id: dossierId,
       mutation_properties: {
-        scheme_id: `SCHEME-${i % 3}`,
+        scheme_id: `SCHEME-${i % 5}`,
         employment_start_date: `${2000 + i}-01-01`,
-        salary: 30000 + i * 5000 + Math.floor(Math.random() * 20000),
+        salary: 30000 + i * 3000 + Math.floor(Math.random() * 15000),
         part_time_factor: 0.6 + Math.random() * 0.4,
       },
     });
   }
 
-  // Add 2 indexation mutations with different filters
+  // Add 5 indexation mutations with different filters (increased from 2)
+  // Indexation with scheme_id filter for SCHEME-0
   mutations.push({
     mutation_id: generateUUID(),
     mutation_definition_name: 'apply_indexation',
@@ -184,6 +185,20 @@ function createComplexRequestPayload() {
     },
   });
 
+  // Indexation with scheme_id filter for SCHEME-1
+  mutations.push({
+    mutation_id: generateUUID(),
+    mutation_definition_name: 'apply_indexation',
+    mutation_type: 'DOSSIER',
+    actual_at: timestamp,
+    dossier_id: dossierId,
+    mutation_properties: {
+      percentage: 0.025,
+      scheme_id: 'SCHEME-1',
+    },
+  });
+
+  // Indexation with effective_before filter
   mutations.push({
     mutation_id: generateUUID(),
     mutation_definition_name: 'apply_indexation',
@@ -192,6 +207,31 @@ function createComplexRequestPayload() {
     dossier_id: dossierId,
     mutation_properties: {
       percentage: 0.02,
+      effective_before: '2010-01-01',
+    },
+  });
+
+  // Global indexation affecting all policies
+  mutations.push({
+    mutation_id: generateUUID(),
+    mutation_definition_name: 'apply_indexation',
+    mutation_type: 'DOSSIER',
+    actual_at: timestamp,
+    dossier_id: dossierId,
+    mutation_properties: {
+      percentage: 0.015,
+    },
+  });
+
+  // Another global indexation
+  mutations.push({
+    mutation_id: generateUUID(),
+    mutation_definition_name: 'apply_indexation',
+    mutation_type: 'DOSSIER',
+    actual_at: timestamp,
+    dossier_id: dossierId,
+    mutation_properties: {
+      percentage: 0.01,
     },
   });
 
