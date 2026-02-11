@@ -2,6 +2,16 @@ import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 import { Rate, Trend, Counter, Gauge } from 'k6/metrics';
 
+/**
+ * K6 Load Test for Pension Calculation Engine
+ * 
+ * This load test is configured to test the calculation endpoint at:
+ * POST /calculation-requests (src/main/java/flyt/inschool/CalculationResource.java)
+ * 
+ * Payload structure based on the example in README.md (lines 106-148)
+ * Tests all core mutations: create_dossier, add_policy, apply_indexation, calculate_retirement_benefit
+ */
+
 // Custom metrics for performance analysis
 const errorRate = new Rate('errors');
 const successRate = new Rate('success');
