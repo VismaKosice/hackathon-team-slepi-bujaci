@@ -1,7 +1,11 @@
 services:
   app:
-    build: .
+    image: quarkus/hyperspeed-quarkus-jvm:latest
+    container_name: hyperspeed-quarkus
     ports:
       - "8080:8080"
-    cpu_count: 2
-
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 12g
