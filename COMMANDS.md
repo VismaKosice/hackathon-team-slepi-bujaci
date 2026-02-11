@@ -6,4 +6,4 @@ build image: `docker build -f src/main/docker/Dockerfile.jvm -t quarkus/hyperspe
 
 run container: `docker compose up`
 
-load test: ``
+load test: `K6_WEB_DASHBOARD=true k6 run load-test.js`
