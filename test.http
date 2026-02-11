@@ -1,93 +1,8 @@
-import http from 'k6/http';
-import {check} from 'k6';
+### POST request to example server
+POST http://localhost:8080/calculation-requests
+Content-Type: application/json
 
-const BASE_URL = 'http://localhost:8080';
-const SCENARIO = 'stress';
-const TARGET_RPS = '10000';
-const DURATION = '2m';
-
-export const options = {
-  scenarios: {
-    stress: {
-      executor: 'ramping-arrival-rate',
-      startRate: 10,
-      timeUnit: '1s',
-      preAllocatedVUs: 50,
-      maxVUs: 1000,
-      exec: 'processCalculation',
-      tags: {test_type: 'stress'},
-      gracefulStop: '15s',
-      stages: [
-        {duration: '20s', target: TARGET_RPS},
-        {duration: '20s', target: TARGET_RPS * 2},
-        {duration: '20s', target: TARGET_RPS * 4},
-        {duration: '20s', target: TARGET_RPS * 6},
-        {duration: '20s', target: TARGET_RPS * 8},
-        {duration: '20s', target: 10},
-      ],
-    },
-  },
-  thresholds: {
-    'http_req_duration': ['p(95)<50', 'p(99)<100'],
-
-    'http_req_failed': ['rate<0.01']
-  },
-};
-
-export function setup() {
-  console.log(`Starting performance test with scenario: ${SCENARIO}`);
-  console.log(`Target RPS: ${TARGET_RPS}`);
-  console.log(`Base URL: ${BASE_URL}`);
-  console.log(`Duration: ${DURATION}`);
-
-  return {startTime: new Date()};
-}
-
-export function processCalculation() {
-  const payload = JSON.stringify({
-    "tenant_id": "tenant-001",
-    "calculation_instructions": {
-      "mutations": [
-        {
-          "mutation_id": "a1111111-1111-1111-1111-111111111111",
-          "mutation_definition_name": "create_dossier",
-          "mutation_type": "DOSSIER_CREATION",
-          "actual_at": "2020-01-01",
-          "mutation_properties": {
-            "dossier_id": "d2222222-2222-2222-2222-222222222222",
-            "person_id": "p3333333-3333-3333-3333-333333333333",
-            "name": "Jane Doe",
-            "birth_date": "1960-06-15"
-          }
-        },
-        {
-          "mutation_id": "b4444444-4444-4444-4444-444444444444",
-          "mutation_definition_name": "add_policy",
-          "mutation_type": "DOSSIER",
-          "actual_at": "2020-01-01",
-          "dossier_id": "d2222222-2222-2222-2222-222222222222",
-          "mutation_properties": {
-            "scheme_id": "SCHEME-A",
-            "employment_start_date": "2000-01-01",
-            "salary": 50000,
-            "part_time_factor": 1.0
-          }
-        },
-        {
-          "mutation_id": "c5555555-5555-5555-5555-555555555555",
-          "mutation_definition_name": "apply_indexation",
-          "mutation_type": "DOSSIER",
-          "actual_at": "2021-01-01",
-          "dossier_id": "d2222222-2222-2222-2222-222222222222",
-          "mutation_properties": {
-            "percentage": 0.03
-          }
-        }
-      ]
-    }
-  });
-
-  const response = http.post(`${BASE_URL}/calculation-requests`, `{
+{
   "tenant_id": "tenant-001",
   "calculation_instructions": {
     "mutations": [
@@ -248,29 +163,4 @@ export function processCalculation() {
       }
     ]
   }
-}
-`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    tags: {
-      endpoint: 'calculation-requests',
-    },
-  });
-
-  check(response, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 500ms': (r) => r.timings.duration < 500,
-    'response time < 1000ms': (r) => r.timings.duration < 1000,
-    'content-type is JSON': (r) => r.headers['Content-Type']?.includes('application/json'),
-    'response body is valid': (r) => {
-      try {
-        const body = JSON.parse(r.body);
-        return body.calculation_metadata && body.calculation_result;
-      } catch (e) {
-        return false;
-      }
-    },
-  });
 }

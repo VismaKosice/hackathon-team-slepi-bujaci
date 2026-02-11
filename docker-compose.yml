@@ -1,7 +1,7 @@
 services:
   app:
-    image: quarkus/hyperspeed-quarkus-jvm:latest
-    container_name: hyperspeed-quarkus
+    image: quarkus/jvm
+    container_name: hyperspeed-quarkus-jvm
     ports:
       - "8080:8080"
     deploy:
